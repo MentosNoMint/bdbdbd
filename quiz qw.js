@@ -1,10 +1,7 @@
 let quizId = 1;
 const sumbit = document.getElementById('sumbit')
+const timer = document.getElementById('timer')
 
-sumbit.addEventListener('click', function() {
-    quizId++ 
-    console.log(quizId)
-});
 
 async function getResponce() {
     let responce = await fetch(`http://localhost:3000/quiz/answer/${quizId}`, {
@@ -35,7 +32,7 @@ async function getResponce() {
         <label for="d" id="answer_d">${content[3]['answer']}</label>
     </
   `
-  console.log(content[key]);
+    console.log(content[key]);
 }
 
 
@@ -58,23 +55,42 @@ async function getResponceAns() {
 
 getResponceAns()
 
+async function nextQuestions() {
+    sumbit.addEventListener('click', function () {
+        quizId++
+
+        return getResponce(), getResponceAns()
+    })
+    getTime()
+    console.log()
+}
+
+nextQuestions()
+
+
+async function getTime() {
+    let count = 3
+
+    countdown = setInterval(() => {
+        count--
+        timer.innerHTML = `${count}s`
+        if (count == 0) {
+            clearInterval(countdown)
+
+            nextQuestions()
+        }
+    }, 1000)
+}
+
+getTime()
 
 
 
 
-   
 
 
-    
-// function nextQuestion() {
-//     currentQuestion++; // увеличиваем номер текущего вопроса
-//     if(currentQuestion < questions.length) { // если есть еще вопросы
-//       document.getElementById("answer").value = ""; // очищаем поле ввода ответа
-//       document.getElementById("result").style.display = "none"; // скрываем блок с результатом
-//       document.querySelector(".question p").innerHTML = questions[currentQuestion].question; // меняем текст вопроса
-//     } else { // если вопросы закончились
-//       document.querySelector(".question").style.display = "none"; // скрываем блок с вопросами
-//       document.querySelector(".result").innerHTML = "Вы ответили на все вопросы"; // выводим сообщение о завершении теста
-//     }
-//   }
+
+
+
+
 
