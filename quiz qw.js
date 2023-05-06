@@ -69,15 +69,17 @@ nextQuestions()
 
 
 async function getTime() {
-    let count = 3
+    let count = 15
 
     countdown = setInterval(() => {
         count--
         timer.innerHTML = `${count}s`
         if (count == 0) {
-            clearInterval(countdown)
-
+            quizId++
+            
             nextQuestions()
+            clearInterval(countdown)
+            return nextQuestions(), getResponce(), getResponceAns()
         }
     }, 1000)
 }
