@@ -1,6 +1,7 @@
 let category = 1;
 let quizId = 1;
 let questiomMass = 0
+let ansMass = 0
 const sumbit = document.getElementById('sumbit')
 const timer = document.getElementById('timer')
 const quiz = document.getElementById('quiz')
@@ -12,7 +13,7 @@ let score = 0
 
 async function getResponce() {
 
-    let numId = await fetch(`http://localhost:4000/questionid/1`, {
+    let numId = await fetch(`http://localhost:4000/questionid/${category}`, {
         method: 'GET',
     })
     const resId = await numId.json()
@@ -21,29 +22,29 @@ async function getResponce() {
 
     let allAns = resId.length
 
-    let quizAnsIdd
-
-    let ansId = await fetch(`http://localhost:4000/questionid/1`, {
+    let ansId = await fetch(`http://localhost:4000/questionid/${category}`, {
         method: 'GET',
     })
     const res = await ansId.json()
 
-    for(i = 0 ; i < allAns; i++){
-       console.log(res[i]['id'])
-    }
-    
-    
+     let ansIdMassive = []
 
+    for(i = 0 ; i < allAns; i++){
+       ansIdMassive.push(res[i]['id'])
+    }
+    console.log(`Итог ${ansIdMassive}`)
     
-    let responce = await fetch(`http://localhost:4000/quiz/answer/${quizId}`, {
+    
+    
+    
+    let responce = await fetch(`http://localhost:4000/quiz/answer/${ansIdMassive[ansMass]}`, {
         method: 'GET',
     })
     const content = await responce.json()
     let key;
-    
+
 
     const list = document.querySelector('.first-block-answers')
-    console.log(content)
     for (key in content)
         list.innerHTML = `
         <li class="answers">
@@ -67,7 +68,22 @@ async function getResponce() {
         <label for="d" id="answer_d">${content[3]['answer']}</label>
     </li>
   `
-  
+  if(content.length == 0){
+    quiz.innerHTML =
+    `
+<div class="finalscore-pos">
+<h2 class="finalscore">Ошибка! Квиз недоделан:(</h2>
+</div>
+<div class="wasting-space"></div>
+<div class="reload-block">
+<button class="reload" onclick="location.reload()">Начать заново</button>
+</div>
+`
+document.getElementById("sumbit").style.visibility = "hidden"
+document.getElementById("timer").style.visibility = "hidden"
+  }
+
+
 
 }
 
@@ -98,12 +114,11 @@ getResponceAns()
 
 async function nextQuestions() {
     
-    let responce = await fetch(`http://localhost:4000/questionid/1`, {
+    let responce = await fetch(`http://localhost:4000/questionid/${category}`, {
         method: 'GET',
     })
     const content = await responce.json()
 
-    console.log(content.length)
 
     let allAns = content.length
 
@@ -112,6 +127,7 @@ async function nextQuestions() {
         if (quizId < allAns) {
             quizId++
             questiomMass++
+            ansMass++
         } else {
             quiz.innerHTML =
                 `
