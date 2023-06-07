@@ -2,6 +2,8 @@ const bodyParser = require('body-parser')
 const express = require('express');
 const sqlite3 = require('sqlite3');
 const db = new sqlite3.Database('./db/quiz.db')
+const db2 = new sqlite3.Database('./db/ans.db')
+const db3 = new sqlite3.Database('./db/users1.db')
 const cors = require('cors');
 
 
@@ -14,214 +16,267 @@ const jsonParser = express.json()
 
 const port = 4000;
 
-app.listen(`${port}` , () =>{
-    console.log("Server is listening on port" + `${port}`);
+app.listen(`${port}`, () => {
+  console.log("Server is listening on port" + `${port}`);
 });
 
 
-app.get('/question' , (req , res) => {
-    db.all(`SELECT * FROM question`, (err, rows) => {
-       res.json(rows)
-    })
+app.get('/question', (req, res) => {
+  db.all(`SELECT * FROM question`, (err, rows) => {
+    res.json(rows)
+  })
 })
 
 
-app.get('/question/title' , (req , res) => {
-    db.all(`SELECT * FROM qtion_answer`, (err, rows) => {
-       res.json(rows)
-    })
+app.get('/question/title', (req, res) => {
+  db.all(`SELECT * FROM qtion_answer`, (err, rows) => {
+    res.json(rows)
+  })
 })
 
 
 
 app.get('/quiz/:id', (req, res) => {
-    const quizId = req.params.id;
-    
-    db.all(`SELECT * FROM question WHERE category_id = ?`, quizId, (err, row) => {
+  const quizId = req.params.id;
+
+  db.all(`SELECT * FROM question WHERE category_id = ?`, quizId, (err, row) => {
     if (err) {
-    console.log(err);
-    res.status(500).send();
-    return;
+      console.log(err);
+      res.status(500).send();
+      return;
     }
     res.send(row);
-    });
-    });
+  });
+});
 
-    app.get('/quiz/answer/:id', (req, res) => {
-        const quizId = req.params.id;
-        
-        db.all(`SELECT * FROM answer WHERE questions_id = ?`, quizId, (err, row) => {
-        if (err) {
-        console.log(err);
-        res.status(500).send();
-        return;
-        }
-        res.send(row);
-        });
-        });
-    
+app.get('/quiz/answer/:id', (req, res) => {
+  const quizId = req.params.id;
 
-    app.get('/quiz/:iуеd' , (req , res) => {
-        const {id} = req.params
+  db.all(`SELECT * FROM answer WHERE questions_id = ?`, quizId, (err, row) => {
+    if (err) {
+      console.log(err);
+      res.status(500).send();
+      return;
+    }
+    res.send(row);
+  });
+});
 
-        const request = `SELECT * FROM  answers WHERE ID=${id} ` 
-            
-            
-            console.log(request)
-            db.run(request, (result ,err) => {
-                if(err) {
-                    res.json(err)
-                }
-                res.json(result)
-            })
-    })
 
-    app.post('/attributes' , (req , res) => {
-        const data = req.body
-        const request = `INSERT INTO ATTRIBUTES VALUES (
+app.get('/quiz/:iуеd', (req, res) => {
+  const { id } = req.params
+
+  const request = `SELECT * FROM  answers WHERE ID=${id} `
+
+
+  console.log(request)
+  db.run(request, (result, err) => {
+    if (err) {
+      res.json(err)
+    }
+    res.json(result)
+  })
+})
+
+app.post('/attributes', (req, res) => {
+  const answer = req.body
+  const request = `INSERT INTO ATTRIBUTES VALUES (
             null, 
-            '${data.name}',
-            '${data.email}')`
-            
-            
-            
-            
-            console.log(request)
-            db.run(request, (err , result) => {
-                if (err) {
-                   return res.json(err)
-                } 
-                
-                    res.json({
-                        data
-                    })
-                
-            })
+            '${answer.name}',
+            '${answer.email}')`
+
+
+
+
+  console.log(request)
+  db2.run(request, (err, result) => {
+    if (err) {
+      return res.json(err)
+    }
+
+    res.json({
+      data
     })
 
-    app.get('/question/title' , (req , res) => {
-           res.json(rows)
-        })
-    
+  })
+})
 
-        app.get('/quiz/category/:id', (req, res) => {
-            const quizId = req.params.id;
-            
-            db.all(`SELECT * FROM subject WHERE id = ?`, quizId, (err, row) => {
-            if (err) {
-            console.log(err);
-            res.status(500).send();
-            return;
-            }
-            res.send(row);
-            });
-            });
+app.get('/question/title', (req, res) => {
+  res.json(rows)
+})
 
 
-            let bd = new sqlite3.Database('./db/users.db', (err) => {
-                if (err) {
-                  console.error(err.message);
-                }
-                console.log('Подключено к основной базе данных.');
-            });
-            
-            // анализатор запросов жсон
-            app.use(express.json());
-            
-            // регистр
-            app.post('/register', (req, res) => {
-              const { username, email, password } = req.body;
-              console.log(req.body)
-              const sql = `INSERT INTO users (username, email, password) VALUES ('${username}', '${email}', '${password}')`;
-            
-              // запрос к бд по регу
-            bd.run(sql, (err) => {
-                if (err) {
-                  console.log(err.message);
-                  res.status(500).send('Почта или никнейм уже используются.');
-                } else {
-                  res.send('Пользователь успешно зарегистрирован.');
-                }
-              });
-            });
-            
-            // логин
-            app.post('/login', (req, res) => {
-              const { email, password } = req.body;
-              const sql = `SELECT * FROM users WHERE email = '${email}' AND password = '${password}'`;
-            
-              // запрос к бд по логину
-              bd.get(sql, (err, row) => {
-                if (err) {
-                  console.log(err.message);
-                  res.status(500).send('Ошибка входа.');
-                } else if (row === undefined) {
-                  res.status(401).send('Неверная почта или пароль.'); //
-                } else {
-                  res.send(`Пользователь ${row.username} авторизован.`);
-                }
-              });
-            });
-            
-            app.get('/list/questions', (req, res) => {
-              db.all(`SELECT * FROM questions`, (err, rows) => {
-                  res.json(rows)
-          
-              })
-          })
-          
-          
-          app.post('/list/questions', (req, res) => {
-              const questions = req.body
-              const request = `INSERT INTO questions VALUES(
+app.get('/quiz/category/:id', (req, res) => {
+  const quizId = req.params.id;
+
+  db.all(`SELECT * FROM subject WHERE id = ?`, quizId, (err, row) => {
+    if (err) {
+      console.log(err);
+      res.status(500).send();
+      return;
+    }
+    res.send(row);
+  });
+});
+
+
+let bd = new sqlite3.Database('./db/users.db', (err) => {
+  if (err) {
+    console.error(err.message);
+  }
+  console.log('Подключено к основной базе данных.');
+});
+
+// анализатор запросов жсон
+app.use(express.json());
+
+// регистр
+app.post('/register', (req, res) => {
+  const { username, email, password } = req.body;
+  console.log(req.body)
+  const sql = `INSERT INTO users (username, email, password) VALUES ('${username}', '${email}', '${password}')`;
+
+  // запрос к бд по регу
+  bd.run(sql, (err) => {
+    if (err) {
+      console.log(err.message);
+      res.status(500).send('Почта или никнейм уже используются.');
+    } else {
+      res.send('Пользователь успешно зарегистрирован.');
+    }
+  });
+});
+
+// логин
+app.post('/login', (req, res) => {
+  const { email, password } = req.body;
+  const sql = `SELECT * FROM users WHERE email = '${email}' AND password = '${password}'`;
+
+  // запрос к бд по логину
+  bd.get(sql, (err, row) => {
+    if (err) {
+      console.log(err.message);
+      res.status(500).send('Ошибка входа.');
+    } else if (row === undefined) {
+      res.status(401).send('Неверная почта или пароль.'); //
+    } else {
+      res.send(`Пользователь ${row.username} авторизован.`);
+    }
+  });
+});
+
+app.get('/list/questions', (req, res) => {
+  db.all(`SELECT * FROM questions`, (err, rows) => {
+    res.json(rows)
+
+  })
+})
+
+
+app.post('/list/questions', (req, res) => {
+  const questions = req.body
+  const request = `INSERT INTO questions VALUES(
               null,
               '${questions.question}'
               )`
-              console.log(request)
-          
-              db.run(request, (err) => {
-                  if (err) {
-                      res.json(err)
-                  }
-                  res.json('добавлено')
-              })
-          }),
-          
-          app.post('/list/answers', (req, res) => {
-              const answers = req.body
-              const zapros = `INSERT INTO answers VALUES(
-                  null,
-                  '${answers.question_id}',
-                  '${answers.answer}',
-                  '${answers.correct}'
-              )`
-              console.log(request)
-          
-              db.run(zapros, (err) => {
-                  if (err) {
-                      res.json(err)
-                  }
-                  res.json('ответы добавлены')
-              })
-          })
+  console.log(request)
+
+  db2.run(request, (err) => {
+    if (err) {
+      res.json(err)
+    }
+    res.json('добавлено')
+  })
+}),
 
 
-          app.get('/questionid/1' , (req , res) => {
-            db.all(`SELECT category_id  , id FROM question WHERE category_id = 1`, (err, rows) => {
-               res.json(rows)
-            })
-        })
 
-        app.get('/questionid/2' , (req , res) => {
-          db.all(`SELECT category_id  , id FROM question WHERE category_id = 2`, (err, rows) => {
-             res.json(rows)
-          })
-      })
+  // запрос бд по категориям
+  app.get('/questionid/1', (req, res) => {
+    db.all(`SELECT category_id  , id FROM question WHERE category_id = 1`, (err, rows) => {
+      res.json(rows)
+    })
+  })
 
-      app.get('/questionid/3' , (req , res) => {
-        db.all(`SELECT category_id  , id FROM question WHERE category_id = 3`, (err, rows) => {
-           res.json(rows)
-        })
+app.get('/questionid/2', (req, res) => {
+  db.all(`SELECT category_id  , id FROM question WHERE category_id = 2`, (err, rows) => {
+    res.json(rows)
+  })
+})
+
+app.get('/questionid/3', (req, res) => {
+  db.all(`SELECT category_id  , id FROM question WHERE category_id = 3`, (err, rows) => {
+    res.json(rows)
+  })
+})
+
+app.get("/users", (req, res) => {
+  db.all("SELECT * FROM users1", function (err, rows) {
+    if (err) {
+      res.status(400).send(err.message);
+    } else {
+      res.send(rows);
+    }
+  });
+});
+
+// POST запрос - добавление нового пользователя в базу данных
+app.post("/users", async (req, res) => {
+  db3.all("SELECT email FROM users ", (err, rows) => {
+
+    let result = rows.map(a => a.email);
+
+    console.log(result)
+
+
+    const { name, email, message } = req.body;
+    if (!name) {
+      res.status(400).send("Name is required");
+      return;
+    }
+
+    if (!email) {
+      res.status(400).send("Age is required");
+      return;
+    }
+
+    if (!message) {
+      res.status(400).send("Age is required");
+      return;
+    }
+    let mass = Array(email)
+
+    for (let i = 0; i < result.length; i++) {
+      if (mass.includes(result[i])) {
+        res.status(400).send("Емайл уже используется");
+        return;
+
+      }
+    }
+
+    console.log(mass)
+
+
+
+
+    db3.run("INSERT INTO users (name, email , message) VALUES (?, ? , ?)", [name, email, message], function (
+      err
+    ) {
+
+      if (err) {
+        res.status(400).send(err.message);
+      } else {
+        res.send(`User ${name} created successfully`);
+      }
+
+    });
+
+  }); app.get('/checkAut', (req, res) => {
+    db3.all("SELECT email FROM users ", (err, rows) => {
+      let massiveAut = []
+      massiveAut.push(rows)
+      res.json(rows)
     })
 
-      
+  })
+})

@@ -12,7 +12,7 @@ form.addEventListener('submit', async (event) => {
         .forEach(element => {
             const { name, type } = element
             const value = type === 'checkbox' ? element.checked : element.value
-            console.log({ name, value })
+            console.log({value})
         })
         
     await fetch('http://localhost:4000/register', {
