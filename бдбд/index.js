@@ -221,6 +221,7 @@ app.get("/users", (req, res) => {
 });
 
 // POST запрос - добавление нового пользователя в базу данных
+//Проверка используеться ли почта юзера
 app.post("/users", async (req, res) => {
   db3.all("SELECT email FROM users ", (err, rows) => {
 
@@ -278,5 +279,108 @@ app.post("/users", async (req, res) => {
       res.json(rows)
     })
 
+  })
+})
+
+
+app.post("/answer/add", async (req, res) => {
+  db.all("SELECT answer FROM answer ", (err, rows) => {
+
+    console.log(rows)
+
+    const { answer, questions_id } = req.body;
+    if (!answer) {
+      res.status(400).send("Вы не ввели ответ");
+      return;
+    }
+
+    db.run("INSERT INTO answer (answer , questions_id) VALUES (?, ?)", [answer, questions_id], function (
+      err
+    ) {
+
+      if (err) {
+        res.status(400).send(err.message);
+      } else {
+        res.send(`Вопрос ${answer} успешно добавлен`);
+      }
+
+    });
+
+  });
+})
+
+
+app.post("/name/quiz/add", async (req, res) => {
+  db.all("SELECT name FROM subject", (err, rows) => {
+    let resultNameQuiz = rows.map(a => a.name)
+    console.log(resultNameQuiz)
+
+
+
+    const { name } = req.body;
+    if (!name) {
+      res.status(400).send("Вы не ввели название квиза");
+      return;
+    }
+
+    let checkmassQuizName = Array(name)
+
+
+    for (let i = 0; i < resultNameQuiz.length; i++) {
+      if (checkmassQuizName.includes(resultNameQuiz[i])) {
+        res.status(400).send("Такое название квиза уже существует");
+        return;
+
+      }
+    }
+
+
+
+    db.run("INSERT INTO subject (name) VALUES (?)", [name], function (
+      err
+    ) {
+      console.log(err)
+      if (err) {
+        res.status(400).send(err.message);
+      } else {
+        res.send(`Название ${name} успешно добавлено`);
+      }
+
+    });
+  });
+});
+
+
+app.post("/question/quiz/add", async (req, res) => {
+  db.all("SELECT questions FROM question", (error, row) => {
+    let resultQuestionQuiz = row.map(a => a.questions)
+    const { questions, category_id } = req.body;
+    let checkQuestionQuiz = Array(questions)
+
+    for (let i = 0; i < resultQuestionQuiz.length; i++) {
+      if (checkQuestionQuiz.includes(resultQuestionQuiz[i])) {
+        res.status(400).send("Такое название вопроса уже существует");
+        return;
+
+      }
+    }
+
+    db.run(`INSERT INTO question (questions , category_id) VALUES (? , ?)`, [questions, category_id], function (
+      err
+    ) {
+      console.log(err)
+      if (err) {
+        res.status(400).send(err.message);
+      } else {
+        res.send(`Вопрос ${questions} успешно добавлен`);
+      }
+
+    });
+  })
+})
+
+app.get('/name/id', (req, res) => {
+  db.all(`SELECT id FROM subject `, (err, rows) => {
+    res.json(rows)
   })
 })
