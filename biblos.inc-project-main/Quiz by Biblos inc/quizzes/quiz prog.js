@@ -7,10 +7,6 @@ const timer = document.getElementById('timer')
 const quiz = document.getElementById('quiz')
 let score = 0
 
-
-
-
-
 async function getResponce() {
 
     let numId = await fetch(`http://localhost:4000/questionid/${category}`, {
@@ -18,7 +14,7 @@ async function getResponce() {
     })
     const resId = await numId.json()
 
-   
+
 
     let allAns = resId.length
 
@@ -27,61 +23,52 @@ async function getResponce() {
     })
     const res = await ansId.json()
 
-     let ansIdMassive = []
+    let ansIdMassive = []
 
-    for(i = 0 ; i < allAns; i++){
-       ansIdMassive.push(res[i]['id'])
+
+    for (i = 0; i < allAns; i++) {
+        ansIdMassive.push(res[i]['id'])
     }
     console.log(`Итог ${ansIdMassive}`)
-    
-    
-    
-    
+
+
+
     let responce = await fetch(`http://localhost:4000/quiz/answer/${ansIdMassive[ansMass]}`, {
         method: 'GET',
     })
     const content = await responce.json()
     let key;
-
+    console.log(content)
 
     const list = document.querySelector('.first-block-answers')
-    for (key in content)
-        list.innerHTML = `
+    const quizName = content.map(a => {
+        return `
         <li class="answers">
-        <input name="answer" type="radio" id="a" class="answer" onclick="setCurrAnswer(${content[0]['is_correct']})"
+        <input name="answers" type="radio" id="${a.id}" class="answer" onclick="setCurrAnswer(${a.is_correct})"
         >
-        <label for="a" id="answer_a">${content[0]['answer']}</label>
+        <label for="${a.id}" id="answer_d">${a.answer}</label>
     </li>
-    <li class="answers">
-        <input name="answer" type="radio" id="b" class="answer" onclick="setCurrAnswer(${content[1]['is_correct']})"
-        >
-        <label for="b" id="answer_b">${content[1]['answer']}</label>
-    </li>
-    <li class="answers">
-        <input name="answer" type="radio" id="c" class="answer" onclick="setCurrAnswer(${content[2]['is_correct']})"
-        >
-        <label for="c" id="answer_c">${content[2]['answer']}</label>
-    </li>
-    <li class="answers">
-        <input name="answer" type="radio" id="d" class="answer" onclick="setCurrAnswer(${content[3]['is_correct']})"
-        >
-        <label for="d" id="answer_d">${content[3]['answer']}</label>
-    </li>
-  `
-  if(content.length == 0){
-    quiz.innerHTML =
     `
-<div class="finalscore-pos">
-<h2 class="finalscore">Ошибка! Квиз недоделан:(</h2>
-</div>
-<div class="wasting-space"></div>
-<div class="reload-block">
-<button class="reload" onclick="location.reload()">Начать заново</button>
-</div>
-`
-document.getElementById("sumbit").style.visibility = "hidden"
-document.getElementById("timer").style.visibility = "hidden"
-  }
+    }).join(' ')
+    console.log(`${quizName}`)
+
+    list.innerHTML = quizName
+
+
+    if (content.length == 0) {
+        quiz.innerHTML =
+            `
+            <div class="finalscore-pos">
+            <h2 class="finalscore">Ошибка! Квиз недоделан:(</h2>
+            </div>
+            <div class="wasting-space"></div>
+            <div class="reload-block">
+            <button class="reload" onclick="location.reload()">Начать заново</button>
+            </div>
+            `
+        document.getElementById("sumbit").style.visibility = "hidden"
+        document.getElementById("timer").style.visibility = "hidden"
+    }
 
 
 
@@ -113,7 +100,7 @@ async function getResponceAns() {
 getResponceAns()
 
 async function nextQuestions() {
-    
+
     let responce = await fetch(`http://localhost:4000/questionid/${category}`, {
         method: 'GET',
     })
@@ -123,7 +110,7 @@ async function nextQuestions() {
     let allAns = content.length
 
     sumbit.addEventListener('click', function () {
-        
+
         if (quizId < allAns) {
             quizId++
             questiomMass++

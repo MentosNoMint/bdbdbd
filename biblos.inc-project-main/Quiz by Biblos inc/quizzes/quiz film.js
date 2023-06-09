@@ -45,30 +45,18 @@ async function getResponce() {
     console.log(ansIdMassive[ansMass])
 
     const list = document.querySelector('.first-block-answers')
-    console.log(content)
-    for (key in content)
-        list.innerHTML = `
+    const quizName = content.map(a => {
+        return `
         <li class="answers">
-        <input name="answer" type="radio" id="a" class="answer" onclick="setCurrAnswer(${content[0]['is_correct']})"
+        <input name="answers" type="radio" id="${a.id}" class="answer" onclick="setCurrAnswer(${a.is_correct})"
         >
-        <label for="a" id="answer_a">${content[0]['answer']}</label>
+        <label for="${a.id}" id="answer_d">${a.answer}</label>
     </li>
-    <li class="answers">
-        <input name="answer" type="radio" id="b" class="answer" onclick="setCurrAnswer(${content[1]['is_correct']})"
-        >
-        <label for="b" id="answer_b">${content[1]['answer']}</label>
-    </li>
-    <li class="answers">
-        <input name="answer" type="radio" id="c" class="answer" onclick="setCurrAnswer(${content[2]['is_correct']})"
-        >
-        <label for="c" id="answer_c">${content[2]['answer']}</label>
-    </li>
-    <li class="answers">
-        <input name="answer" type="radio" id="d" class="answer" onclick="setCurrAnswer(${content[3]['is_correct']})"
-        >
-        <label for="d" id="answer_d">${content[3]['answer']}</label>
-    </li>
-  `
+    `
+    }).join(' ')
+    console.log(`${quizName}`)
+
+    list.innerHTML = quizName
   if(content.length == 0){
     quiz.innerHTML =
     `
