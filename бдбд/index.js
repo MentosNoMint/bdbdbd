@@ -384,3 +384,10 @@ app.get('/name/id', (req, res) => {
     res.json(rows)
   })
 })
+
+app.get('/category/quiz/name/id', (req, res) => {
+  db.all(`SELECT id , name FROM subject `, (err, rows) => {
+    res.json(rows)
+  })
+})
+
