@@ -55,20 +55,20 @@ async function getResponce() {
     list.innerHTML = quizName
 
 
-    if (content.length == 0) {
-        quiz.innerHTML =
-            `
-            <div class="finalscore-pos">
-            <h2 class="finalscore">Ошибка! Квиз недоделан:(</h2>
-            </div>
-            <div class="wasting-space"></div>
-            <div class="reload-block">
-            <button class="reload" onclick="location.reload()">Начать заново</button>
-            </div>
-            `
-        document.getElementById("sumbit").style.visibility = "hidden"
-        document.getElementById("timer").style.visibility = "hidden"
-    }
+    // if (content.length == 0) {
+    //     quiz.innerHTML =
+    //         `
+    //         <div class="finalscore-pos">
+    //         <h2 class="finalscore">Ошибка! Квиз недоделан:(</h2>
+    //         </div>
+    //         <div class="wasting-space"></div>
+    //         <div class="reload-block">
+    //         <button class="reload" onclick="location.reload()">Начать заново</button>
+    //         </div>
+    //         `
+    //     document.getElementById("sumbit").style.visibility = "hidden"
+    //     document.getElementById("timer").style.visibility = "hidden"
+    // }
 
 
 

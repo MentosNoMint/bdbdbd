@@ -192,20 +192,11 @@ app.post('/list/questions', (req, res) => {
 
 
   // запрос бд по категориям
-  app.get('/questionid/1', (req, res) => {
-    db.all(`SELECT category_id  , id FROM question WHERE category_id = 1`, (err, rows) => {
-      res.json(rows)
-    })
-  })
+  
 
-app.get('/questionid/2', (req, res) => {
-  db.all(`SELECT category_id  , id FROM question WHERE category_id = 2`, (err, rows) => {
-    res.json(rows)
-  })
-})
-
-app.get('/questionid/3', (req, res) => {
-  db.all(`SELECT category_id  , id FROM question WHERE category_id = 3`, (err, rows) => {
+app.get('/questionid/:id', (req, res) => {
+  const {id} = req.params
+  db.all(`SELECT category_id  , id FROM question WHERE category_id = ${id}`, (err, rows) => {
     res.json(rows)
   })
 })
@@ -294,7 +285,7 @@ app.post("/answer/add", async (req, res) => {
       return;
     }
 
-    db.run("INSERT INTO answer (answer , questions_id , is_correct) VALUES (?, ? , ?)", [answer, questions_id , is_correct], function (
+    db.run("INSERT INTO answer (answer , questions_id , is_correct) VALUES (?, ? , ?)", [answer, questions_id + 1, is_correct], function (
       err
     ) {
 
@@ -365,7 +356,7 @@ app.post("/question/quiz/add", async (req, res) => {
       }
     }
 
-    db.run(`INSERT INTO question (questions , category_id) VALUES (? , ?)`, [questions, category_id], function (
+    db.run(`INSERT INTO question (questions , category_id) VALUES (? , ?)`, [questions, category_id + 1], function (
       err
     ) {
       console.log(err)
@@ -409,3 +400,48 @@ app.get('/category/quiz/name/id', (req, res) => {
   })
 })
 
+                //Удаление квиза//
+app.delete('/delete/quiz/:id' , (req , res) => {
+  const {id} = req.params
+  const request = `DELETE FROM subject WHERE 
+      id=${id}`
+      
+      console.log(request)
+      db.run(request, (err) => {
+          if(err) {
+              res.json(err)
+          }
+          res.json('запись удалена')
+      })
+      
+})
+               //удаление вопроса квиза
+app.delete('/delete/question/:id' , (req , res) => {
+  const {id} = req.params
+  const request = `DELETE FROM question WHERE 
+      category_id=${id}`
+      
+      console.log(request)
+      db.run(request, (err) => {
+          if(err) {
+              res.json(err)
+          }
+          res.json('запись удалена')
+      })
+      
+})
+               //удаление отвоветов к вопросам
+app.delete('/delete/answer/:id' , (req , res) => {
+  const {id} = req.params
+  const request = `DELETE FROM answer WHERE 
+      questions_id=${id}`
+      
+      console.log(request)
+      db.run(request, (err) => {
+          if(err) {
+              res.json(err)
+          }
+          res.json('запись удалена')
+      })
+      
+})

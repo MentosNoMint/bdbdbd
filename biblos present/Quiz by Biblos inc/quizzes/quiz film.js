@@ -68,6 +68,7 @@ async function getResponce() {
 <button class="reload" onclick="location.reload()">Начать заново</button>
 </div>
 `
+  
 document.getElementById("sumbit").style.visibility = "hidden"
 document.getElementById("timer").style.visibility = "hidden"
   }
